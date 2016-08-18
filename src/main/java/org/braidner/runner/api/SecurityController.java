@@ -20,7 +20,7 @@ import javax.validation.Valid;
  * Time: 13:59
  */
 @RestController
-@RequestMapping("api/security")
+@RequestMapping("security")
 public class SecurityController {
 
     @RequestMapping(value = "test", method = RequestMethod.POST)

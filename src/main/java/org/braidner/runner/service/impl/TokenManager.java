@@ -1,10 +1,11 @@
 package org.braidner.runner.service.impl;
 
+import org.braidner.runner.domain.GoogleAuthentication;
 import org.braidner.runner.service.TokenValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,20 +23,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenManager implements AuthenticationManager {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
+
+    private final TokenValidator tokenValidator;
 
     @Autowired
-    @Qualifier("googleTokenValidator")
-    private TokenValidator tokenValidator;
+    public TokenManager(UserDetailsService userDetailsService, @Qualifier("googleTokenValidator") TokenValidator tokenValidator) {
+        this.userDetailsService = userDetailsService;
+        this.tokenValidator = tokenValidator;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        UserDetails user = userDetailsService.loadUserByUsername(authentication.getName());
-        String token = (String) authentication.getCredentials();
-        if (!tokenValidator.validate(token)) {
-            throw new RuntimeException("Google token is not valid: " + token);
+        if (authentication instanceof GoogleAuthentication) {
+            GoogleAuthentication auth = (GoogleAuthentication) authentication;
+            UserDetails user = userDetailsService.loadUserByUsername(auth.getUsername());
+            String token = auth.getToken();
+            if (!tokenValidator.validate(token)) throw new RuntimeException("Google token is not valid: " + token);
+
+            return new GoogleAuthentication(token, true, user);
         }
-        return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+        throw new AuthenticationServiceException("Token expired date error");
     }
 }
