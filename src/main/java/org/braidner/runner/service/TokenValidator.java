@@ -1,5 +1,7 @@
 package org.braidner.runner.service;
 
+import org.braidner.runner.dto.TokenInfo;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Braidner
@@ -8,4 +10,6 @@ package org.braidner.runner.service;
  */
 public interface TokenValidator {
     boolean validate(String token);
+
+    TokenInfo getTokenInfo(String token);
 }

@@ -1,6 +1,7 @@
 package org.braidner.runner.service.impl;
 
 import org.braidner.runner.domain.GoogleAuthentication;
+import org.braidner.runner.dto.TokenInfo;
 import org.braidner.runner.service.TokenValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
@@ -37,11 +37,10 @@ public class TokenManager implements AuthenticationManager {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (authentication instanceof GoogleAuthentication) {
             GoogleAuthentication auth = (GoogleAuthentication) authentication;
-            UserDetails user = userDetailsService.loadUserByUsername(auth.getUsername());
             String token = auth.getToken();
             if (!tokenValidator.validate(token)) throw new RuntimeException("Google token is not valid: " + token);
-
-            return new GoogleAuthentication(token, true, user);
+            TokenInfo tokenInfo = tokenValidator.getTokenInfo(token);
+            return new GoogleAuthentication(token, true, userDetailsService.loadUserByUsername(tokenInfo.getEmail()));
         }
         throw new AuthenticationServiceException("Token expired date error");
     }
