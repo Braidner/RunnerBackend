@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OauthController {
 
+    @RequestMapping
+    public void index() {
+    }
+
     @RequestMapping("oauth2callback")
     public void callback() {
 
