@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
  * User: Braidner
  * Date: 16/08/2016
  * Time: 14:33
- * TODO https://javattitude.com/2014/06/07/spring-security-custom-token-based-rest-authentication/
- *
  */
 @Component
 public class TokenManager implements AuthenticationManager {
