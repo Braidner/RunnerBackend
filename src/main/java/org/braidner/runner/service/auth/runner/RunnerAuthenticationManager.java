@@ -1,6 +1,6 @@
-package org.braidner.runner.service.impl;
+package org.braidner.runner.service.auth.runner;
 
-import org.braidner.runner.domain.GoogleAuthentication;
+import org.braidner.runner.domain.RunnerAuthentication;
 import org.braidner.runner.dto.TokenInfo;
 import org.braidner.runner.service.TokenValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,26 +19,27 @@ import org.springframework.stereotype.Component;
  * Time: 14:33
  */
 @Component
-public class TokenManager implements AuthenticationManager {
+public class RunnerAuthenticationManager implements AuthenticationManager {
 
     private final UserDetailsService userDetailsService;
 
     private final TokenValidator tokenValidator;
 
     @Autowired
-    public TokenManager(UserDetailsService userDetailsService, @Qualifier("googleTokenValidator") TokenValidator tokenValidator) {
+    public RunnerAuthenticationManager(UserDetailsService userDetailsService, @Qualifier("runnerTokenValidator") TokenValidator tokenValidator) {
         this.userDetailsService = userDetailsService;
         this.tokenValidator = tokenValidator;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (authentication instanceof GoogleAuthentication) {
-            GoogleAuthentication auth = (GoogleAuthentication) authentication;
+        if (authentication instanceof RunnerAuthentication) {
+            RunnerAuthentication auth = (RunnerAuthentication) authentication;
             String token = auth.getToken();
-            if (!tokenValidator.validate(token)) throw new RuntimeException("Google token is not valid: " + token);
+            if (!tokenValidator.validate(token)) throw new RuntimeException("Runner token is not valid: " + token);
             TokenInfo tokenInfo = tokenValidator.getTokenInfo(token);
-            return new GoogleAuthentication(token, true, userDetailsService.loadUserByUsername(tokenInfo.getEmail()));
+
+            return new RunnerAuthentication(token, true, userDetailsService.loadUserByUsername(tokenInfo.getUserId()));
         }
         throw new AuthenticationServiceException("Token expired date error");
     }

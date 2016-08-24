@@ -10,14 +10,22 @@ import retrofit2.Retrofit;
 @Configuration
 public class ClientBuilder {
 
-
     @Bean
-    public GoogleClient build() {
+    public GoogleClient buildGoogleClient() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(GoogleClient.BASE_URL)
                 .build();
 
         return retrofit.create(GoogleClient.class);
+    }
+
+    @Bean
+    public GoogleAccountsClient buildGoogleAccountsClient() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(GoogleAccountsClient.BASE_URL)
+                .build();
+
+        return retrofit.create(GoogleAccountsClient.class);
     }
 
 

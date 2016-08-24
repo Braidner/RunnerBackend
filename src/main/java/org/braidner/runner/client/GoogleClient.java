@@ -11,6 +11,6 @@ import retrofit2.http.Path;
 public interface GoogleClient {
     String BASE_URL = "https://www.googleapis.com/oauth2/v3/";
 
-    @GET("tokeninfo?id_token={token}")
+    @GET("tokeninfo?access_token={token}")
     Call<TokenInfo> getTokenInfo(@Path("token") String token);
 }

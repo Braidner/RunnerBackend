@@ -23,11 +23,16 @@ public class RunnerBackendApplication {
     @EnableGlobalMethodSecurity(prePostEnabled = true)
     protected static class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        private final Filter tokenFilter;
+        private final Filter googleFilter;
+        private final Filter runnerFilter;
 
         @Autowired
-        public WebSecurityConfig(@Qualifier("tokenFilter") Filter tokenFilter) {
-            this.tokenFilter = tokenFilter;
+        public WebSecurityConfig(
+                @Qualifier("googleAuthenticationFilter") Filter googleFilter,
+                @Qualifier("runnerAuthenticationFilter") Filter runnerFilter
+        ) {
+            this.googleFilter = googleFilter;
+            this.runnerFilter = runnerFilter;
         }
 
         @Override
@@ -35,9 +40,16 @@ public class RunnerBackendApplication {
             http
                     .headers().frameOptions().sameOrigin()
                     .and()
-                    .addFilterAfter(tokenFilter, UsernamePasswordAuthenticationFilter.class)
+                    .addFilterAfter(googleFilter, UsernamePasswordAuthenticationFilter.class)
                     .authorizeRequests()
                     .antMatchers("/api/*").authenticated();
+
+            http
+                    .headers().frameOptions().sameOrigin()
+                    .and()
+                    .addFilterAfter(runnerFilter, UsernamePasswordAuthenticationFilter.class)
+                    .authorizeRequests()
+                    .antMatchers("/auth/*").authenticated();
 
             http.csrf().disable();
         }

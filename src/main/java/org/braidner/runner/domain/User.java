@@ -21,6 +21,7 @@ public class User implements UserDetails, Serializable {
     @Id private String guid;
     @Indexed private String deviceId;
     @Indexed private String username;
+    @Indexed private String userId;
     private String password;
     private DeviceType deviceType;
 
@@ -96,5 +97,13 @@ public class User implements UserDetails, Serializable {
 
     public void setDeviceType(DeviceType deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

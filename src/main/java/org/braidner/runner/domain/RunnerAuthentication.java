@@ -9,7 +9,7 @@ import java.util.Collection;
 /**
  * Created by Braidner
  */
-public class GoogleAuthentication implements Authentication {
+public class RunnerAuthentication implements Authentication {
 
     private String token;
     private Collection<? extends GrantedAuthority> authorities;
@@ -18,14 +18,12 @@ public class GoogleAuthentication implements Authentication {
     private String username;
     private String userId;
 
-    public GoogleAuthentication(String token, String username, String userId) {
+    public RunnerAuthentication(String token) {
         this.token = token;
-        this.username = username;
-        this.userId = userId;
     }
 
-    public GoogleAuthentication(String token, boolean isAuthenticated,
-                               UserDetails principal) {
+    public RunnerAuthentication(String token, boolean isAuthenticated,
+                                UserDetails principal) {
         this.token = token;
         this.isAuthenticated = isAuthenticated;
         this.principal = principal;

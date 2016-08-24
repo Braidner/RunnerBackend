@@ -1,4 +1,4 @@
-package org.braidner.runner.service.impl;
+package org.braidner.runner.service.auth.google;
 
 import org.braidner.runner.domain.GoogleAuthentication;
 import org.slf4j.Logger;
@@ -25,20 +25,21 @@ import java.io.IOException;
  * Created by KuznetsovNE on 18.08.2016.
  */
 @Component
-public class TokenFilter extends AbstractAuthenticationProcessingFilter {
+public class GoogleAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(GoogleAuthenticationFilter.class);
     private static final String HEADER_SECURITY_TOKEN = "X-GoogleToken";
     private static final String HEADER_SECURITY_USERNAME = "X-Username";
+    private static final String HEADER_SECURITY_USER_ID = "X-User-id";
 
     @Autowired
-    public TokenFilter(@Qualifier("tokenManager") AuthenticationManager authenticationManager) {
-        super("/api/**");
+    public GoogleAuthenticationFilter(@Qualifier("googleAuthenticationManager") AuthenticationManager authenticationManager) {
+        super("/auth/**");
         setAuthenticationManager(authenticationManager);
         setAuthenticationSuccessHandler((request, response, authentication) ->
         {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            request.getRequestDispatcher(request.getServletPath() + request.getPathInfo()).forward(request, response);
+            request.getRequestDispatcher(request.getServletPath() + "/auth").forward(request, response);
         });
         setAuthenticationFailureHandler((request, response, authenticationException)
                 -> response.getOutputStream().print(authenticationException.getMessage()));
@@ -48,10 +49,11 @@ public class TokenFilter extends AbstractAuthenticationProcessingFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         String token = request.getHeader(HEADER_SECURITY_TOKEN);
         String username = request.getHeader(HEADER_SECURITY_USERNAME);
-        if (token == null || username == null) {
+        String userId = request.getHeader(HEADER_SECURITY_USER_ID);
+        if (token == null || username == null || userId == null) {
             throw new UsernameNotFoundException("Token not found");
         }
-        GoogleAuthentication tokenAuthentication = new GoogleAuthentication(token, username);
+        GoogleAuthentication tokenAuthentication = new GoogleAuthentication(token, username, userId);
         return getAuthenticationManager().authenticate(tokenAuthentication);
     }
 

@@ -1,6 +1,7 @@
 package org.braidner.runner.service;
 
 import org.braidner.runner.dto.TokenInfo;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,4 +13,6 @@ public interface TokenValidator {
     boolean validate(String token);
 
     TokenInfo getTokenInfo(String token);
+
+    void addToken(String token, UserDetails userDetails);
 }
